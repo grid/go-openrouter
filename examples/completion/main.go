@@ -11,8 +11,8 @@ import (
 
 func main() {
 	ctx := context.Background()
-	client := openrouter.NewClient(os.Getenv("OPENROUTER_API_KEY"))
-	request := openrouter.ChatCompletionRequest{
+	client := openrouter.NewClient[any](os.Getenv("OPENROUTER_API_KEY"))
+	request := openrouter.ChatCompletionRequest[any]{
 		Model: openrouter.DeepseekV3,
 		Messages: []openrouter.ChatCompletionMessage{
 			{

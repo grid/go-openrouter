@@ -9,30 +9,30 @@ import (
 	"net/url"
 )
 
-type Client struct {
+type Client[Schema any] struct {
 	config ClientConfig
 
 	requestBuilder RequestBuilder
 }
 
-func NewClient(auth string, opts ...Option) *Client {
+func NewClient[Schema any](auth string, opts ...Option) *Client[Schema] {
 	config := DefaultConfig(auth)
 
 	for _, opt := range opts {
 		opt(config)
 	}
 
-	return NewClientWithConfig(*config)
+	return NewClientWithConfig[Schema](*config)
 }
 
-func NewClientWithConfig(config ClientConfig) *Client {
-	return &Client{
+func NewClientWithConfig[Schema any](config ClientConfig) *Client[Schema] {
+	return &Client[Schema]{
 		config:         config,
 		requestBuilder: NewRequestBuilder(),
 	}
 }
 
-func (c *Client) sendRequest(req *http.Request, v any) error {
+func (c *Client[Schema]) sendRequest(req *http.Request, v any) error {
 	req.Header.Set("Accept", "application/json; charset=utf-8")
 
 	// Check whether Content-Type is already set, Upload Files API requires
@@ -57,7 +57,7 @@ func (c *Client) sendRequest(req *http.Request, v any) error {
 	return decodeResponse(res.Body, v)
 }
 
-func (c *Client) setCommonHeaders(req *http.Request) {
+func (c *Client[Schema]) setCommonHeaders(req *http.Request) {
 	req.Header.Set("HTTP-Referer", c.config.HttpReferer)
 	req.Header.Set("X-Title", c.config.XTitle)
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", c.config.authToken))
@@ -100,7 +100,7 @@ func withQuery(query url.Values) fullUrlOption {
 }
 
 // fullURL returns full URL for request.
-func (c *Client) fullURL(suffix string, setters ...fullUrlOption) string {
+func (c *Client[Schema]) fullURL(suffix string, setters ...fullUrlOption) string {
 	// Default Options
 	args := &fullUrlOptions{
 		query: nil,
@@ -135,7 +135,7 @@ func withContentType(contentType string) requestOption {
 	}
 }
 
-func (c *Client) newRequest(ctx context.Context, method, url string, setters ...requestOption) (*http.Request, error) {
+func (c *Client[Schema]) newRequest(ctx context.Context, method, url string, setters ...requestOption) (*http.Request, error) {
 	// Default Options
 	args := &requestOptions{
 		body:   nil,
@@ -152,7 +152,7 @@ func (c *Client) newRequest(ctx context.Context, method, url string, setters ...
 	return req, nil
 }
 
-func (c *Client) newStreamRequest(
+func (c *Client[Schema]) newStreamRequest(
 	ctx context.Context,
 	method string,
 	urlSuffix string,
@@ -171,7 +171,7 @@ func (c *Client) newStreamRequest(
 	return req, nil
 }
 
-func (c *Client) handleErrorResp(resp *http.Response) error {
+func (c *Client[Schema]) handleErrorResp(resp *http.Response) error {
 	var errRes ErrorResponse
 
 	err := json.NewDecoder(resp.Body).Decode(&errRes)

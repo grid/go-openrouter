@@ -8,7 +8,7 @@ import (
 	"io"
 	"testing"
 
-	openrouter "github.com/revrost/go-openrouter"
+	"github.com/revrost/go-openrouter"
 	"github.com/stretchr/testify/require"
 )
 
@@ -18,7 +18,7 @@ func TestChatCompletionMessageMarshalJSON_StreamingWithReasoning(t *testing.T) {
 	client := createTestClient(t)
 
 	stream, err := client.CreateChatCompletionStream(
-		context.Background(), openrouter.ChatCompletionRequest{
+		context.Background(), openrouter.ChatCompletionRequest[any]{
 			Reasoning: &openrouter.ChatCompletionReasoning{
 				Effort: openrouter.String("high"),
 			},
@@ -55,7 +55,7 @@ func TestChatCompletionMessageMarshalJSON_Streaming(t *testing.T) {
 	client := createTestClient(t)
 
 	stream, err := client.CreateChatCompletionStream(
-		context.Background(), openrouter.ChatCompletionRequest{
+		context.Background(), openrouter.ChatCompletionRequest[any]{
 			Model: "qwen/qwen3-235b-a22b-07-25:free",
 			Messages: []openrouter.ChatCompletionMessage{
 				{

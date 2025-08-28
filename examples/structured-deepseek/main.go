@@ -12,7 +12,7 @@ import (
 
 func main() {
 	ctx := context.Background()
-	client := openrouter.NewClient(os.Getenv("OPENROUTER_API_KEY"))
+	client := openrouter.NewClient[any](os.Getenv("OPENROUTER_API_KEY"))
 
 	type Result struct {
 		Location    string  `json:"location"`
@@ -29,7 +29,7 @@ func main() {
 		log.Fatalf("GenerateSchemaForType error: %v", err)
 	}
 
-	request := openrouter.ChatCompletionRequest{
+	request := openrouter.ChatCompletionRequest[any]{
 		Model: openrouter.DeepseekV3,
 		Messages: []openrouter.ChatCompletionMessage{
 			{
@@ -41,7 +41,7 @@ func main() {
 				Content: openrouter.Content{Text: "What's the weather like in London?"},
 			},
 		},
-		ResponseFormat: &openrouter.ChatCompletionResponseFormat{
+		ResponseFormat: &openrouter.ChatCompletionResponseFormat[any]{
 			Type: openrouter.ChatCompletionResponseFormatTypeJSONObject,
 		},
 	}

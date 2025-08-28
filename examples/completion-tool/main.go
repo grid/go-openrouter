@@ -12,7 +12,7 @@ import (
 
 func main() {
 	ctx := context.Background()
-	client := openrouter.NewClient(os.Getenv("OPENROUTER_API_KEY"))
+	client := openrouter.NewClient[any](os.Getenv("OPENROUTER_API_KEY"))
 	var provider *openrouter.ChatProvider
 
 	// describe the function & its inputs
@@ -48,7 +48,7 @@ func main() {
 		dialogue[0].Content, f.Name)
 
 	resp, err := client.CreateChatCompletion(ctx,
-		openrouter.ChatCompletionRequest{
+		openrouter.ChatCompletionRequest[any]{
 			Model:    openrouter.GeminiFlash8B,
 			Provider: provider,
 			Messages: dialogue,
@@ -95,7 +95,7 @@ func main() {
 		// simulate calling the function & responding to openrouter
 		fmt.Println("Sending openrouter function's response and requesting the reply to the original question...")
 		resp, err = client.CreateChatCompletion(ctx,
-			openrouter.ChatCompletionRequest{
+			openrouter.ChatCompletionRequest[any]{
 				Model:    openrouter.GeminiFlash8B,
 				Provider: provider,
 				Messages: dialogue,

@@ -9,12 +9,12 @@ import (
 	"testing"
 	"time"
 
-	openrouter "github.com/revrost/go-openrouter"
+	"github.com/revrost/go-openrouter"
 	"github.com/stretchr/testify/require"
 )
 
 // Test client setup
-func createTestClient(t *testing.T) *openrouter.Client {
+func createTestClient(t *testing.T) *openrouter.Client[any] {
 	t.Helper()
 	token := os.Getenv("OPENROUTER_API_KEY")
 	if token == "" {
@@ -22,7 +22,7 @@ func createTestClient(t *testing.T) *openrouter.Client {
 	}
 
 	// Add optional headers if needed
-	return openrouter.NewClient(token,
+	return openrouter.NewClient[any](token,
 		openrouter.WithXTitle("Integration Tests"),
 		openrouter.WithHTTPReferer("https://github.com/revrost/go-openrouter"),
 	)
@@ -33,13 +33,13 @@ func TestCreateChatCompletion(t *testing.T) {
 
 	tests := []struct {
 		name     string
-		request  openrouter.ChatCompletionRequest
+		request  openrouter.ChatCompletionRequest[any]
 		wantErr  bool
 		validate func(*testing.T, openrouter.ChatCompletionResponse)
 	}{
 		{
 			name: "basic completion",
-			request: openrouter.ChatCompletionRequest{
+			request: openrouter.ChatCompletionRequest[any]{
 				Model: "qwen/qwen3-235b-a22b-07-25:free",
 				Messages: []openrouter.ChatCompletionMessage{
 					{
@@ -59,7 +59,7 @@ func TestCreateChatCompletion(t *testing.T) {
 		},
 		{
 			name: "invalid model",
-			request: openrouter.ChatCompletionRequest{
+			request: openrouter.ChatCompletionRequest[any]{
 				Model: "invalid-model",
 				Messages: []openrouter.ChatCompletionMessage{
 					{Role: openrouter.ChatMessageRoleUser, Content: openrouter.Content{Text: "Hello"}},
@@ -69,7 +69,7 @@ func TestCreateChatCompletion(t *testing.T) {
 		},
 		{
 			name: "streaming not supported",
-			request: openrouter.ChatCompletionRequest{
+			request: openrouter.ChatCompletionRequest[any]{
 				Model:  openrouter.LiquidLFM7B,
 				Stream: true,
 				Messages: []openrouter.ChatCompletionMessage{
@@ -125,7 +125,7 @@ func TestExplicitPromptCachingApplies(t *testing.T) {
 			},
 		},
 	}
-	request := openrouter.ChatCompletionRequest{
+	request := openrouter.ChatCompletionRequest[any]{
 		Model: "google/gemini-2.5-flash-preview-05-20",
 		Messages: []openrouter.ChatCompletionMessage{
 			message,
@@ -146,7 +146,7 @@ func TestExplicitPromptCachingApplies(t *testing.T) {
 
 func TestUsageAccounting(t *testing.T) {
 	client := createTestClient(t)
-	request := openrouter.ChatCompletionRequest{
+	request := openrouter.ChatCompletionRequest[any]{
 		Model: "qwen/qwen3-235b-a22b-07-25:free",
 		Messages: []openrouter.ChatCompletionMessage{
 			openrouter.SystemMessage("You are a helpful assistant."),
@@ -169,9 +169,9 @@ func TestUsageAccounting(t *testing.T) {
 
 func TestAuthFailure(t *testing.T) {
 	// Test with invalid token
-	client := openrouter.NewClient("invalid-token")
+	client := openrouter.NewClient[any]("invalid-token")
 
-	_, err := client.CreateChatCompletion(context.Background(), openrouter.ChatCompletionRequest{
+	_, err := client.CreateChatCompletion(context.Background(), openrouter.ChatCompletionRequest[any]{
 		Model: openrouter.LiquidLFM7B,
 		Messages: []openrouter.ChatCompletionMessage{
 			{Role: openrouter.ChatMessageRoleUser, Content: openrouter.Content{Text: "Hello"}},
@@ -187,7 +187,7 @@ func TestProviderError(t *testing.T) {
 	client := createTestClient(t)
 
 	ctx := context.Background()
-	_, err := client.CreateChatCompletion(ctx, openrouter.ChatCompletionRequest{
+	_, err := client.CreateChatCompletion(ctx, openrouter.ChatCompletionRequest[any]{
 		Model: "openai/gpt-5-nano",
 		Messages: []openrouter.ChatCompletionMessage{
 			{
@@ -195,7 +195,7 @@ func TestProviderError(t *testing.T) {
 				Content: openrouter.Content{Text: "This will always fail with a provider error, because openai requires the message to contain the word j-s-o-n."},
 			},
 		},
-		ResponseFormat: &openrouter.ChatCompletionResponseFormat{
+		ResponseFormat: &openrouter.ChatCompletionResponseFormat[any]{
 			Type: openrouter.ChatCompletionResponseFormatTypeJSONObject,
 		},
 	})
@@ -219,7 +219,7 @@ func TestGetGeneration(t *testing.T) {
 
 	ctx := context.Background()
 
-	request := openrouter.ChatCompletionRequest{
+	request := openrouter.ChatCompletionRequest[any]{
 		Model: "openai/gpt-oss-20b:free",
 		Messages: []openrouter.ChatCompletionMessage{
 			openrouter.SystemMessage("You are a helpful assistant."),

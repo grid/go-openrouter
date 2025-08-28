@@ -87,7 +87,7 @@ type PDFPlugin struct {
 	Engine string `json:"engine"`
 }
 
-type ChatCompletionRequest struct {
+type ChatCompletionRequest[Schema any] struct {
 	Model string `json:"model,omitempty"`
 	// Optional model fallbacks: https://openrouter.ai/docs/features/model-routing#the-models-parameter
 	Models   []string                `json:"models,omitempty"`
@@ -104,20 +104,20 @@ type ChatCompletionRequest struct {
 	// MaxCompletionTokens Upper bound for completion tokens, supported for OpenAI API compliance.
 	// Prefer "max_tokens" for limiting output in new integrations.
 	// refs: https://platform.openai.com/docs/api-reference/chat/create#chat-create-max_completion_tokens
-	MaxCompletionTokens int                           `json:"max_completion_tokens,omitempty"`
-	Temperature         float32                       `json:"temperature,omitempty"`
-	TopP                float32                       `json:"top_p,omitempty"`
-	TopK                int                           `json:"top_k,omitempty"`
-	TopA                float32                       `json:"top_a,omitempty"`
-	N                   int                           `json:"n,omitempty"`
-	Stream              bool                          `json:"stream,omitempty"`
-	Stop                []string                      `json:"stop,omitempty"`
-	PresencePenalty     float32                       `json:"presence_penalty,omitempty"`
-	RepetitionPenalty   float32                       `json:"repetition_penalty,omitempty"`
-	ResponseFormat      *ChatCompletionResponseFormat `json:"response_format,omitempty"`
-	Seed                *int                          `json:"seed,omitempty"`
-	MinP                float32                       `json:"min_p,omitempty"`
-	FrequencyPenalty    float32                       `json:"frequency_penalty,omitempty"`
+	MaxCompletionTokens int                                   `json:"max_completion_tokens,omitempty"`
+	Temperature         float32                               `json:"temperature,omitempty"`
+	TopP                float32                               `json:"top_p,omitempty"`
+	TopK                int                                   `json:"top_k,omitempty"`
+	TopA                float32                               `json:"top_a,omitempty"`
+	N                   int                                   `json:"n,omitempty"`
+	Stream              bool                                  `json:"stream,omitempty"`
+	Stop                []string                              `json:"stop,omitempty"`
+	PresencePenalty     float32                               `json:"presence_penalty,omitempty"`
+	RepetitionPenalty   float32                               `json:"repetition_penalty,omitempty"`
+	ResponseFormat      *ChatCompletionResponseFormat[Schema] `json:"response_format,omitempty"`
+	Seed                *int                                  `json:"seed,omitempty"`
+	MinP                float32                               `json:"min_p,omitempty"`
+	FrequencyPenalty    float32                               `json:"frequency_penalty,omitempty"`
 	// LogitBias is must be a token id string (specified by their token ID in the tokenizer), not a word string.
 	// incorrect: `"logit_bias":{"You": 6}`, correct: `"logit_bias":{"1639": 6}`
 	// refs: https://platform.openai.com/docs/api-reference/chat/create#chat/create-logit_bias
@@ -334,16 +334,16 @@ const (
 	ChatCompletionResponseFormatTypeText       ChatCompletionResponseFormatType = "text"
 )
 
-type ChatCompletionResponseFormat struct {
-	Type       ChatCompletionResponseFormatType        `json:"type,omitempty"`
-	JSONSchema *ChatCompletionResponseFormatJSONSchema `json:"json_schema,omitempty"`
+type ChatCompletionResponseFormat[Schema any] struct {
+	Type       ChatCompletionResponseFormatType                `json:"type,omitempty"`
+	JSONSchema *ChatCompletionResponseFormatJSONSchema[Schema] `json:"json_schema,omitempty"`
 }
 
-type ChatCompletionResponseFormatJSONSchema struct {
-	Name        string         `json:"name"`
-	Description string         `json:"description,omitempty"`
-	Schema      json.Marshaler `json:"schema"`
-	Strict      bool           `json:"strict"`
+type ChatCompletionResponseFormatJSONSchema[Schema any] struct {
+	Name        string `json:"name"`
+	Description string `json:"description,omitempty"`
+	Schema      Schema `json:"schema"`
+	Strict      bool   `json:"strict"`
 }
 
 type FunctionDefinition struct {
@@ -514,9 +514,9 @@ func isSupportingModel(suffix, model string) bool {
 }
 
 // CreateChatCompletion — API call to Create a completion for the chat message.
-func (c *Client) CreateChatCompletion(
+func (c *Client[Schema]) CreateChatCompletion(
 	ctx context.Context,
-	request ChatCompletionRequest,
+	request ChatCompletionRequest[any],
 ) (response ChatCompletionResponse, err error) {
 	if request.Stream {
 		err = ErrChatCompletionStreamNotSupported
@@ -549,9 +549,9 @@ type ChatCompletionStream struct {
 }
 
 // CreateChatCompletionStream — API call to Create a completion for the chat message with streaming.
-func (c *Client) CreateChatCompletionStream(
+func (c *Client[Schema]) CreateChatCompletionStream(
 	ctx context.Context,
-	request ChatCompletionRequest,
+	request ChatCompletionRequest[any],
 ) (*ChatCompletionStream, error) {
 	if !request.Stream {
 		request.Stream = true

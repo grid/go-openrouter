@@ -40,7 +40,7 @@ type Generation struct {
 	NumSearchResults       *int     `json:"num_search_results,omitempty"`
 }
 
-func (c *Client) GetGeneration(ctx context.Context, id string) (generation Generation, err error) {
+func (c *Client[Schema]) GetGeneration(ctx context.Context, id string) (generation Generation, err error) {
 	query := url.Values{}
 
 	query.Set("id", id)

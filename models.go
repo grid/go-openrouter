@@ -49,7 +49,7 @@ type Model struct {
 	SupportedParameters []string          `json:"supported_parameters,omitempty"`
 }
 
-func (c *Client) ListModels(ctx context.Context) (models []Model, err error) {
+func (c *Client[Schema]) ListModels(ctx context.Context) (models []Model, err error) {
 	req, err := c.newRequest(
 		ctx,
 		http.MethodGet,
@@ -69,7 +69,7 @@ func (c *Client) ListModels(ctx context.Context) (models []Model, err error) {
 	return
 }
 
-func (c *Client) ListUserModels(ctx context.Context) (models []Model, err error) {
+func (c *Client[Schema]) ListUserModels(ctx context.Context) (models []Model, err error) {
 	req, err := c.newRequest(
 		ctx,
 		http.MethodGet,
