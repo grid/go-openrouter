@@ -2,6 +2,7 @@ package openrouter
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 	"net/url"
 )
@@ -11,33 +12,40 @@ const (
 )
 
 type Generation struct {
-	ID                     string   `json:"id"`
-	TotalCost              float64  `json:"total_cost"`
-	CreatedAt              string   `json:"created_at"`
-	Model                  string   `json:"model"`
-	Origin                 string   `json:"origin"`
-	Usage                  float64  `json:"usage"`
-	IsBYOK                 bool     `json:"is_byok"`
-	UpstreamID             *string  `json:"upstream_id,omitempty"`
-	CacheDiscount          *float64 `json:"cache_discount,omitempty"`
-	UpstreamInferenceCost  *float64 `json:"upstream_inference_cost,omitempty"`
-	AppID                  *int     `json:"app_id,omitempty"`
-	Streamed               *bool    `json:"streamed,omitempty"`
-	Cancelled              *bool    `json:"cancelled,omitempty"`
-	ProviderName           *string  `json:"provider_name,omitempty"`
-	Latency                *int     `json:"latency,omitempty"`
-	ModerationLatency      *int     `json:"moderation_latency,omitempty"`
-	GenerationTime         *int     `json:"generation_time,omitempty"`
-	FinishReason           *string  `json:"finish_reason,omitempty"`
-	NativeFinishReason     *string  `json:"native_finish_reason,omitempty"`
-	TokensPrompt           *int     `json:"tokens_prompt,omitempty"`
-	TokensCompletion       *int     `json:"tokens_completion,omitempty"`
-	NativeTokensPrompt     *int     `json:"native_tokens_prompt,omitempty"`
-	NativeTokensCompletion *int     `json:"native_tokens_completion,omitempty"`
-	NativeTokensReasoning  *int     `json:"native_tokens_reasoning,omitempty"`
-	NumMediaPrompt         *int     `json:"num_media_prompt,omitempty"`
-	NumMediaCompletion     *int     `json:"num_media_completion,omitempty"`
-	NumSearchResults       *int     `json:"num_search_results,omitempty"`
+	ID                           string          `json:"id"`
+	TotalCost                    float64         `json:"total_cost"`
+	CreatedAt                    string          `json:"created_at"`
+	Model                        string          `json:"model"`
+	Origin                       string          `json:"origin"`
+	Usage                        float64         `json:"usage"`
+	IsBYOK                       bool            `json:"is_byok"`
+	UpstreamID                   *string         `json:"upstream_id,omitempty"`
+	CacheDiscount                *float64        `json:"cache_discount,omitempty"`
+	UpstreamInferenceCost        *float64        `json:"upstream_inference_cost,omitempty"`
+	AppID                        *int            `json:"app_id,omitempty"`
+	Streamed                     *bool           `json:"streamed,omitempty"`
+	Cancelled                    *bool           `json:"cancelled,omitempty"`
+	ProviderName                 *string         `json:"provider_name,omitempty"`
+	Latency                      *int            `json:"latency,omitempty"`
+	ModerationLatency            *int            `json:"moderation_latency,omitempty"`
+	GenerationTime               *int            `json:"generation_time,omitempty"`
+	FinishReason                 *string         `json:"finish_reason,omitempty"`
+	NativeFinishReason           *string         `json:"native_finish_reason,omitempty"`
+	TokensPrompt                 *int            `json:"tokens_prompt,omitempty"`
+	TokensCompletion             *int            `json:"tokens_completion,omitempty"`
+	NativeTokensPrompt           *int            `json:"native_tokens_prompt,omitempty"`
+	NativeTokensCompletion       *int            `json:"native_tokens_completion,omitempty"`
+	NativeTokensCompletionImages *int            `json:"native_tokens_completion_images,omitempty"`
+	NativeTokensReasoning        *int            `json:"native_tokens_reasoning,omitempty"`
+	NativeTokensCached           *int            `json:"native_tokens_cached,omitempty"`
+	NumMediaPrompt               *int            `json:"num_media_prompt,omitempty"`
+	NumInputAudioPrompt          *int            `json:"num_input_audio_prompt,omitempty"`
+	NumMediaCompletion           *int            `json:"num_media_completion,omitempty"`
+	NumSearchResults             *int            `json:"num_search_results,omitempty"`
+	ExternalUser                 string          `json:"external_user"`
+	ApiType                      string          `json:"api_type"`
+	ProviderResponses            json.RawMessage `json:"provider_responses,omitempty"`
+	Router                       json.RawMessage `json:"router,omitempty"`
 }
 
 func (c *Client[Schema]) GetGeneration(ctx context.Context, id string) (generation Generation, err error) {
