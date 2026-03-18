@@ -101,6 +101,10 @@ type ChatCompletionRequest[Schema any] struct {
 	// MaxTokens The maximum number of tokens that can be generated in the chat completion.
 	// This value can be used to control costs for text generated via API.
 	MaxTokens int `json:"max_tokens,omitempty"`
+
+	// Top-level caching (Anthropic style)
+	CacheControl *CacheControl `json:"cache_control,omitempty"`
+
 	// MaxCompletionTokens Upper bound for completion tokens, supported for OpenAI API compliance.
 	// Prefer "max_tokens" for limiting output in new integrations.
 	// refs: https://platform.openai.com/docs/api-reference/chat/create#chat-create-max_completion_tokens
