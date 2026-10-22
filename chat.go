@@ -135,6 +135,8 @@ type ChatCompletionRequest[Schema any] struct {
 	// logprobs must be set to true if this parameter is used.
 	TopLogProbs int    `json:"top_logprobs,omitempty"`
 	User        string `json:"user,omitempty"`
+	// ServiceTier selects the endpoint's scheduling tier; empty sends nothing.
+	ServiceTier string `json:"service_tier,omitempty"`
 	// Deprecated: use Tools instead.
 	Functions []FunctionDefinition `json:"functions,omitempty"`
 	// Deprecated: use ToolChoice instead.
